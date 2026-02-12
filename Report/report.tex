@@ -87,18 +87,24 @@
 \section{Week by Week}\label{homework}
 
 \subsection{Week 1}
-\subsubsection{Notes and Homework}
+
+\subsubsection{Exercise 1: Word Processing with DFAs}
+
+\textbf{Notes and Homework:}
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth]{../BkD7CQiYJe.jpg}
-  \caption{Homework 0 image 2}
+  \caption{Automata $A_1$ and $A_2$}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth]{../Bk0mRmjYJg.jpg}
-  \caption{Homework 0 image 1}
+  \caption{Additional automata reference}
 \end{figure}
+
+\textbf{Question 1:} Which of the following words are accepted/refused by $A_1$ and $A_2$, respectively? Complete the table.
 
 \begin{table}[H]
   \centering
@@ -106,17 +112,60 @@
   \begin{tabular}{|c|c|c|}
     \hline
     $w$ & accepted by $A_1$? & accepted by $A_2$? \\ \hline
-    $aaa$ & yes & yes \\ \hline
-    $aab$ & yes & yes \\ \hline
-    $aba$ & yes & yes \\ \hline
-    $abb$ & yes & yes \\ \hline
-    $baa$ & yes & yes \\ \hline
-    $bab$ & yes & yes \\ \hline
-    $bba$ & yes & yes \\ \hline
-    $bbb$ & yes & yes \\ \hline
+    $aaa$ & no & yes \\ \hline
+    $aab$ & yes & no \\ \hline
+    $aba$ & no & no \\ \hline
+    $abb$ & no & no \\ \hline
+    $baa$ & no & yes \\ \hline
+    $bab$ & no & no \\ \hline
+    $bba$ & no & no \\ \hline
+    $bbb$ & no & no \\ \hline
   \end{tabular}
   \caption{Acceptance table for $A_1$ and $A_2$}
 \end{table}
+
+\textbf{Question 2:} More generally, can you completely describe the languages $L(A_k)$ accepted by $A_k$, for $k = 1, 2$?
+
+The language $L(A)$ accepted by this DFA is:
+$$L(A) = \{ w \in \{a,b\}^* \mid \text{the number of } a \text{'s in } w \text{ is even} \}$$
+
+\subsubsection{Exercise 2: Designing DFAs}
+
+Design DFAs whose accepted languages are given as follows:
+
+\begin{enumerate}
+  \item All the words that end with $ab$
+  \item All the words that contain $ab$
+  \item All the words that contain an odd number of $a$'s and an odd number of $b$'s
+  \item All the words that contain an even number of $a$'s and an odd number of $b$'s
+  \item All the words such that any three consecutive characters contain at least one $a$
+  \item All the words that contain $aba$
+\end{enumerate}
+
+\textbf{DFA Diagrams:}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=3cm, ->, >=stealth]
+    \node[state, initial] (q0) {$q_0$};
+    \node[state] (q1) [right of=q0] {$q_1$};
+    \node[state, accepting] (q2) [right of=q1] {$q_2$};
+    
+    \path (q0) edge [loop above] node {$b$} (q0);
+    \path (q0) edge [above] node {$a$} (q1);
+    
+    \path (q1) edge [loop above] node {$a$} (q1);
+    \path (q1) edge [above] node {$b$} (q2);
+    
+    \path (q2) edge [bend left=30, below] node {$a$} (q1);
+    \path (q2) edge [bend right=50, above] node {$b$} (q0);
+  \end{tikzpicture}
+  \caption{DFA for words ending with $ab$}
+\end{figure}
+
+\vspace{0.3cm}
+
+\textbf{Observation:} Compare the various automata designed above. What patterns do you notice in their structure and complexity?
 
 \section{Synthesis}
 
