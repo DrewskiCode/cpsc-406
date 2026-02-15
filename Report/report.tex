@@ -163,9 +163,162 @@ Design DFAs whose accepted languages are given as follows:
   \caption{DFA for words ending with $ab$}
 \end{figure}
 
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm, ->, >=stealth]
+    \node[state, initial] (q0) {$q_0$};
+    \node[state] (q1) [right of=q0] {$q_1$};
+    \node[state] (q2) [right of=q1] {$q_2$};
+    \node[state, accepting] (q3) [right of=q2] {$q_3$};
+    
+    \path (q0) edge [loop above] node {$b$} (q0);
+    \path (q0) edge [above] node {$a$} (q1);
+    
+    \path (q1) edge [bend left=20, above] node {$a$} (q0);
+    \path (q1) edge [above] node {$b$} (q2);
+    
+    \path (q2) edge [above] node {$a$} (q3);
+    \path (q2) edge [bend right=50, below] node {$b$} (q0);
+    
+    \path (q3) edge [loop above] node {$a, b$} (q3);
+  \end{tikzpicture}
+  \caption{DFA for words containing $aba$}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=3cm, ->, >=stealth]
+    % States: (even a, even b), (odd a, even b), (even a, odd b), (odd a, odd b)
+    \node[state, initial] (q00) {$q_{00}$};
+    \node[state] (q10) [right of=q00] {$q_{10}$};
+    \node[state] (q01) [below of=q00] {$q_{01}$};
+    \node[state, accepting] (q11) [right of=q01] {$q_{11}$};
+    
+    % a transitions (toggle first index)
+    \path (q00) edge [bend left, above] node {$a$} (q10);
+    \path (q10) edge [bend left, below] node {$a$} (q00);
+    \path (q01) edge [bend left, above] node {$a$} (q11);
+    \path (q11) edge [bend left, below] node {$a$} (q01);
+    
+    % b transitions (toggle second index)
+    \path (q00) edge [bend left, left] node {$b$} (q01);
+    \path (q01) edge [bend left, right] node {$b$} (q00);
+    \path (q10) edge [bend left, left] node {$b$} (q11);
+    \path (q11) edge [bend left, right] node {$b$} (q10);
+  \end{tikzpicture}
+  \caption{DFA for words with odd number of $a$'s and odd number of $b$'s}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm, ->, >=stealth]
+    % States: q0=(even a, even b), q1=(odd a, even b), q2=(odd a, odd b), q3=(even a, odd b) ACCEPT
+    \node[state, initial] (q0) {$q_0$};
+    \node[state] (q1) [right of=q0] {$q_1$};
+    \node[state] (q2) [right of=q1] {$q_2$};
+    \node[state, accepting] (q3) [right of=q2] {$q_3$};
+    
+    % a transitions (q0 <-> q1, q3 <-> q2)
+    \path (q0) edge [bend left=20, above] node {$a$} (q1);
+    \path (q1) edge [bend left=20, below] node {$a$} (q0);
+    \path (q3) edge [bend left=20, above] node {$a$} (q2);
+    \path (q2) edge [bend left=20, below] node {$a$} (q3);
+    
+    % b transitions (q0 <-> q3, q1 <-> q2)
+    \path (q0) edge [bend left=40, above] node {$b$} (q3);
+    \path (q3) edge [bend left=40, below] node {$b$} (q0);
+    \path (q1) edge [bend left=40, above] node {$b$} (q2);
+    \path (q2) edge [bend left=40, below] node {$b$} (q1);
+  \end{tikzpicture}
+  \caption{DFA for words with even number of $a$'s and odd number of $b$'s}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm, ->, >=stealth]
+    % Top row: q0 (start), q1, q2, q3 (final)
+    \node[state, initial] (q0) {$q_0$};
+    \node[state] (q1) [right of=q0] {$q_1$};
+    \node[state] (q2) [right of=q1] {$q_2$};
+    \node[state, accepting] (q3) [right of=q2] {$q_3$};
+    
+    % Right column: q4 (final), q5 (final)
+    \node[state, accepting] (q4) [below of=q3] {$q_4$};
+    \node[state, accepting] (q5) [below of=q4] {$q_5$};
+    
+    % Bottom left: q6
+    \node[state] (q6) [left of=q5, xshift=-2.5cm] {$q_6$};
+    
+    % Top row transitions (b's going right)
+    \path (q0) edge [above] node {$b$} (q1);
+    \path (q1) edge [above] node {$b$} (q2);
+    \path (q2) edge [above] node {$a$} (q3);
+    
+    % Self-loops
+    \path (q0) edge [loop above] node {$a$} (q0);
+    \path (q3) edge [loop right] node {$a$} (q3);
+    \path (q6) edge [loop left] node {$a$} (q6);
+    
+    % Long 'a' arc from q0 over the top to q3
+    \path (q0) edge [bend left=50, above] node {$a$} (q3);
+    
+    % Vertical transitions on right (b going down)
+    \path (q3) edge [right] node {$b$} (q4);
+    \path (q4) edge [right] node {$b$} (q5);
+    
+    % a transitions between q3, q4
+    \path (q4) edge [bend left=20, left] node {$a$} (q3);
+    
+    % Bottom transitions
+    \path (q5) edge [above] node {$b$} (q6);
+    \path (q6) edge [bend left=30, below] node {$b$} (q5);
+  \end{tikzpicture}
+  \caption{DFA for words where any three consecutive characters contain at least one $a$}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm, ->, >=stealth]
+    % States: q0 = seen 0 b's, q1 = seen 1 b, q2 = seen 2 b's, q3 = seen bbb (accept)
+    \node[state, initial] (q0) {$q_0$};
+    \node[state] (q1) [right of=q0] {$q_1$};
+    \node[state] (q2) [right of=q1] {$q_2$};
+    \node[state, accepting] (q3) [right of=q2] {$q_3$};
+    
+    % b transitions (moving right toward accepting state)
+    \path (q0) edge [above] node {$b$} (q1);
+    \path (q1) edge [above] node {$b$} (q2);
+    \path (q2) edge [above] node {$b$} (q3);
+    
+    % a transitions (reset to q0)
+    \path (q0) edge [loop above] node {$a$} (q0);
+    \path (q1) edge [bend left=30, below] node {$a$} (q0);
+    \path (q2) edge [bend left=40, below] node {$a$} (q0);
+    
+    % Once in q3, stay there on any input
+    \path (q3) edge [loop above] node {$a$} (q3);
+    \path (q3) edge [loop below] node {$b$} (q3);
+  \end{tikzpicture}
+  \caption{DFA for words containing $bbb$}
+\end{figure}
+
 \vspace{0.3cm}
 
-\textbf{Observation:} Compare the various automata designed above. What patterns do you notice in their structure and complexity?
+\textbf{What do you notice when comparing the various automata?}
+
+When comparing the DFAs designed above, several patterns emerge:
+
+\begin{itemize}
+  \item \textbf{State count reflects language complexity:} Simple properties like "ends with $ab$" require only 3 states, while tracking multiple independent conditions (like counting both $a$'s and $b$'s modulo 2) requires $2^n$ states where $n$ is the number of independent conditions being tracked.
+  
+  \item \textbf{Parity-based languages form grid structures:} DFAs for languages involving "odd/even" counts tend to have states arranged in a grid pattern, where each dimension corresponds to one parity condition. The transitions toggle between states along each axis.
+  
+  \item \textbf{Substring containment uses linear chains:} DFAs that check for substring containment (like "contains $ab$" or "contains $bbb$") have a linear chain of states tracking progress toward finding the substring, with "reset" transitions back to earlier states when the pattern is broken.
+  
+  \item \textbf{Accepting states indicate language structure:} For "contains" languages, once the target is found, we stay in an accepting sink state. For parity languages, specific combinations of parities determine acceptance.
+  
+  \item \textbf{Self-loops handle "don't care" inputs:} When an input symbol doesn't affect progress toward acceptance (like $a$'s in "contains $bbb$" after reaching the accepting state), self-loops keep the automaton in place.
+\end{itemize}
 
 \section{Synthesis}
 
