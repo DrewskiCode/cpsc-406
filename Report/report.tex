@@ -322,6 +322,185 @@ When comparing the DFAs designed above, several patterns emerge:
 
 \section{Synthesis}
 
+\subsection{Week 2}
+
+\subsubsection{Exercise 1: Product Automata}
+
+\textbf{Homework prompt:} Work with the two DFAs shown below, describe their languages, and build the product automata needed for intersection and union.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm, ->, >=stealth]
+    \node[state, initial] (a1) {$1$};
+    \node[state, accepting] (a2) [right of=a1] {$2$};
+    \node[state] (a3) [right of=a2] {$3$};
+    \node[state, accepting] (a4) [below of=a2] {$4$};
+    \path (a1) edge [above] node {$a$} (a2)
+               edge [bend left, left] node {$b$} (a4)
+          (a2) edge [above] node {$a$} (a3)
+               edge [bend left, left] node {$b$} (a4)
+          (a3) edge [loop above] node {$a,b$} (a3)
+          (a4) edge [bend left, right] node {$a$} (a2)
+               edge [bend left, below] node {$b$} (a3);
+  \end{tikzpicture}
+  \caption{Automaton $\mathcal{A}^{(1)}$}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm, ->, >=stealth]
+    \node[state, initial] (b1) {$1$};
+    \node[state, accepting] (b2) [right of=b1] {$2$};
+    \node[state] (b3) [below of=b1] {$3$};
+    \path (b1) edge [above] node {$a$} (b2)
+               edge [left] node {$b$} (b3)
+          (b2) edge [bend left] node {$a,b$} (b1)
+          (b3) edge [loop below] node {$a,b$} (b3);
+  \end{tikzpicture}
+  \caption{Automaton $\mathcal{A}^{(2)}$}
+\end{figure}
+
+\textbf{Question 1: Describe $L(\mathcal{A}^{(1)})$ and $L(\mathcal{A}^{(2)})$.}
+
+\begin{itemize}
+  \item $L(\mathcal{A}^{(1)})$ is “all strings that stop the moment you land in state 2 or jump from 2 to 4.” You must reach 2 by reading an $a$. You may then loop through “$a$ back to 2, $b$ down to 4” as often as you like, but the word has to end right after that last $a$ into 2 or $b$ into 4.
+  \item $L(\mathcal{A}^{(2)})$ is “all strings that start with $a$, never fall into state 3, and stay parked in 2.” Once you enter 2 on the first $a$, every later letter must be whatever keeps you there; if you ever take the $b$ to 3 the word is rejected.
+\end{itemize}
+
+\textbf{Question 2: Construct the intersection automaton $\mathcal{A}$.}
+
+The standard product construction uses ordered pairs $(p,q)$ where $p$ is a state of $\mathcal{A}^{(1)}$ and $q$ a state of $\mathcal{A}^{(2)}$. We only draw reachable states.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[->, >=stealth]
+    \node[state, initial] (s11) at (0,0) {$(1,1)$};
+    \node[state, accepting] (s22) at (3,0) {$(2,2)$};
+    \node[state] (s31) at (6,0) {$(3,1)$};
+    \node[state] (s32) at (9,0) {$(3,2)$};
+    \node[state] (s41) at (3,-2) {$(4,1)$};
+    \node[state] (s33) at (6,-2) {$(3,3)$};
+    \node[state] (s43) at (0,-3) {$(4,3)$};
+    \node[state] (s23) at (3,-3) {$(2,3)$};
+    \path (s11) edge [above] node {$a$} (s22)
+       edge [left] node {$b$} (s43)
+     (s22) edge [above] node {$a$} (s31)
+       edge [right] node {$b$} (s41)
+     (s31) edge [above] node {$a$} (s32)
+       edge [right] node {$b$} (s33)
+     (s32) edge [bend left] node {$a,b$} (s31)
+     (s41) edge [left] node {$a$} (s22)
+       edge [below] node {$b$} (s33)
+     (s43) edge [above] node {$a$} (s23)
+       edge [below] node {$b$} (s33)
+     (s23) edge [above] node {$a$} (s33)
+       edge [above] node {$b$} (s43)
+     (s33) edge [loop below] node {$a,b$} (s33);
+  \end{tikzpicture}
+  \caption{Intersection automaton $\mathcal{A}$}
+\end{figure}
+
+\textbf{Question 3: Show $L(\mathcal{A}) = L(\mathcal{A}^{(1)}) \cap L(\mathcal{A}^{(2)})$.}
+
+The product DFA only has one double-circle state, $(2,2)$. Getting there means the $\mathcal{A}^{(1)}$ copy is sitting happily in 2 (after possibly bouncing through 4) while the $\mathcal{A}^{(2)}$ copy is also in 2. So a word survives in the product exactly when it makes  both  original machines happy at the same time, i.e., when it lies in the intersection.
+
+\textbf{Question 4: Modify $\mathcal{A}$ to obtain $\mathcal{A}'$ with $L(\mathcal{A}') = L(\mathcal{A}^{(1)}) \cup L(\mathcal{A}^{(2)})$.}
+
+Keep the same transition structure but change the accepting set to
+\[
+F' = \{ (p,q) \mid p \in F_{\mathcal{A}^{(1)}} \text{ or } q \in F_{\mathcal{A}^{(2)}} \}.
+\]
+Now any word accepted by either original automaton drives the product to a state whose pair has at least one accepting component, so the language is the union.
+
+\subsubsection{Exercise 2: More Automata}
+
+\textbf{Homework prompt:} Repeat the same analysis for the DFAs $\mathcal{B}^{(1)}$ and $\mathcal{B}^{(2)}$ below.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.4cm, ->, >=stealth]
+    \node[state, initial, accepting] (p0) {$p_0$};
+    \node[state] (p1) [right of=p0] {$p_1$};
+    \node[state] (p2) [right of=p1] {$p_2$};
+    \path (p0) edge [loop above] node {$b$} (p0)
+     edge [above] node {$a$} (p1)
+     (p1) edge [loop above] node {$b$} (p1)
+     edge [above] node {$a$} (p2)
+     (p2) edge [loop above] node {$b$} (p2)
+     edge [bend right=40, below] node {$a$} (p0);
+  \end{tikzpicture}
+  \caption{Automaton $\mathcal{B}^{(1)}$}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.4cm, ->, >=stealth]
+    \node[state, initial, accepting] (q0) {$q_0$};
+    \node[state] (q1) [right of=q0] {$q_1$};
+    \node[state] (q2) [right of=q1] {$q_2$};
+    \path (q0) edge [loop above] node {$b$} (q0)
+     edge [above] node {$a$} (q1)
+     (q1) edge [above] node {$a$} (q2)
+     edge [bend right=40, below] node {$b$} (q0)
+     (q2) edge [loop above] node {$a,b$} (q2);
+  \end{tikzpicture}
+  \caption{Automaton $\mathcal{B}^{(2)}$}
+\end{figure}
+
+\textbf{Question 1: Describe $L(\mathcal{B}^{(1)})$ and $L(\mathcal{B}^{(2)})$.}
+
+\begin{itemize}
+  \item $L(\mathcal{B}^{(1)})$ = “count $a$’s in groups of three and ignore $b$’s.” The machine walks through $p_0 \rightarrow p_1 \rightarrow p_2 \rightarrow p_0$ every time an $a$ shows up, so you only end in the accepting home state $p_0$ when the total number of $a$’s is a multiple of three.
+  \item $L(\mathcal{B}^{(2)})$ = “never write two $a$’s back-to-back.” You can stay in $q_0$ on $b$’s, hop to $q_1$ on a single $a$, but a second immediate $a$ throws you into the sink $q_2$. As long as every $a$ is separated by at least one $b$, you return to $q_0$ and the word is accepted.
+\end{itemize}
+
+\textbf{Question 2: Construct the intersection automaton $\mathcal{B}$.}
+
+The full product has nine reachable states. Starting from $(p_0,q_0)$ we obtain the transition graph shown below. Because only $p_0$ and $q_0$ are accepting in their respective machines, the sole accepting pair is $(p_0,q_0)$.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[->, >=stealth]
+    \node[state, initial, accepting] (s00) at (0,0) {$(p_0,q_0)$};
+    \node[state] (s10) at (3,0) {$(p_1,q_0)$};
+    \node[state] (s20) at (6,0) {$(p_2,q_0)$};
+    \node[state] (s01) at (0,-2.4) {$(p_0,q_1)$};
+    \node[state] (s11) at (3,-2.4) {$(p_1,q_1)$};
+    \node[state] (s21) at (6,-2.4) {$(p_2,q_1)$};
+    \node[state] (s02) at (0,-4.8) {$(p_0,q_2)$};
+    \node[state] (s12) at (3,-4.8) {$(p_1,q_2)$};
+    \node[state] (s22) at (6,-4.8) {$(p_2,q_2)$};
+    \path (s00) edge [bend left=10] node {$a$} (s11)
+                 edge [loop left] node {$b$} (s00)
+          (s10) edge [bend left=10] node {$a$} (s21)
+                 edge [loop above] node {$b$} (s10)
+          (s20) edge [bend left=10] node {$a$} (s01)
+                 edge [loop above] node {$b$} (s20)
+          (s01) edge [bend left=10] node {$a$} (s12)
+                 edge [left] node {$b$} (s00)
+          (s11) edge [bend left=10] node {$a$} (s22)
+                 edge [left] node {$b$} (s10)
+          (s21) edge [bend left=10] node {$a$} (s02)
+                 edge [right] node {$b$} (s20)
+          (s02) edge [bend left=10] node {$a$} (s12)
+                 edge [loop below] node {$b$} (s02)
+          (s12) edge [bend left=10] node {$a$} (s22)
+                 edge [loop below] node {$b$} (s12)
+          (s22) edge [bend left=10] node {$a$} (s02)
+                 edge [loop below] node {$b$} (s22);
+  \end{tikzpicture}
+  \caption{Intersection automaton $\mathcal{B}$}
+\end{figure}
+
+\textbf{Question 3: Why does $L(\mathcal{B}) = L(\mathcal{B}^{(1)}) \cap L(\mathcal{B}^{(2)})$?}
+
+Each arrow in the product just mirrors the arrows in the two base DFAs. The only double-circle state is $(p_0,q_0)$, so the combined machine says “yes” exactly when both halves also say “yes” at the end of the word. That is the definition of the intersection.
+
+\textbf{Question 4: Obtaining the union language.}
+
+As in Exercise 1, we can apply De Morgan's law. Complement each DFA by flipping accepting/non-accepting states, build the product, and complement again. Equivalently, start from the product above and simply mark as accepting every pair where at least one component is accepting. Either construction yields an automaton $\mathcal{B}'$ whose language is $L(\mathcal{B}^{(1)}) \cup L(\mathcal{B}^{(2)})$.
+
+
 \section{Evidence of Participation}
 
 \section{Conclusion}\label{conclusion}
