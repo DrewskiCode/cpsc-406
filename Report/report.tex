@@ -500,6 +500,258 @@ Each arrow in the product just mirrors the arrows in the two base DFAs. The only
 
 As in Exercise 1, we can apply De Morgan's law. Complement each DFA by flipping accepting/non-accepting states, build the product, and complement again. Equivalently, start from the product above and simply mark as accepting every pair where at least one component is accepting. Either construction yields an automaton $\mathcal{B}'$ whose language is $L(\mathcal{B}^{(1)}) \cup L(\mathcal{B}^{(2)})$.
 
+\subsection{Week 3}
+
+\subsubsection{Problem 1}
+
+\textbf{Homework prompt:} For the alphabet $\Sigma = \{a, b, c\}$, consider the following NFA $\mathcal{A}$:
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm, ->, >=stealth]
+    \node[state, initial] (q0) {$0$};
+    \node[state] (q1) [right of=q0] {$1$};
+    \node[state, accepting] (q2) [above right of=q1] {$2$};
+    \node[state, accepting] (q3) [below right of=q1] {$3$};
+    \path (q0) edge [loop above] node {$a,b$} (q0)
+               edge [above] node {$a$} (q1)
+          (q1) edge [above left] node {$b$} (q2)
+               edge [below left] node {$c$} (q3);
+  \end{tikzpicture}
+  \caption{NFA $\mathcal{A}$ over $\Sigma = \{a,b,c\}$}
+\end{figure}
+
+\textbf{Question 1: Describe the language accepted by $\mathcal{A}$ using a regular expression.}
+
+State~$0$ loops on $a$ and $b$, so we can read any mix of $a$'s and $b$'s at the start. At some point we take the $a$-arrow into state~$1$, and then read one more symbol: $b$ lands in state~$2$, or $c$ lands in state~$3$. Both are accepting with no way out, so the word ends right there. In short, every accepted word is ``some $a$'s and $b$'s, then $a$, then $b$ or $c$'':
+\[
+  L(\mathcal{A}) \;=\; (a+b)^{*}\,a\,(b+c).
+\]
+
+\textbf{Question 2: Specify the NFA $\mathcal{A}$ in the form $(Q, \Sigma, \delta, q_0, F)$.}
+
+\[
+\mathcal{A} = (Q,\;\Sigma,\;\delta,\;q_0,\;F)
+\]
+where
+\begin{itemize}
+  \item $Q = \{0, 1, 2, 3\}$
+  \item $\Sigma = \{a, b, c\}$
+  \item $q_0 = 0$
+  \item $F = \{2, 3\}$
+  \item The transition function $\delta$ (which maps each state--symbol pair to a set of possible next states) is:
+\end{itemize}
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|c|c|c|c|}
+    \hline
+    $\delta$ & $a$ & $b$ & $c$ \\ \hline
+    $0$ & $\{0,1\}$ & $\{0\}$ & $\emptyset$ \\ \hline
+    $1$ & $\emptyset$ & $\{2\}$ & $\{3\}$ \\ \hline
+    $2$ & $\emptyset$ & $\emptyset$ & $\emptyset$ \\ \hline
+    $3$ & $\emptyset$ & $\emptyset$ & $\emptyset$ \\ \hline
+  \end{tabular}
+  \caption{Transition function of $\mathcal{A}$}
+\end{table}
+
+\textbf{Question 3: Find all paths in $\mathcal{A}$ for the word $v = abab$.}
+
+We follow every possible way the NFA can read $abab$ from start to finish. Paths that get stuck before reading the whole word are left out:
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[->, >=stealth, node distance=2cm]
+    % Path 1: 0 -a-> 0 -b-> 0 -a-> 0 -b-> 0
+    \node (p1s0) {$0$};
+    \node (p1s1) [right of=p1s0] {$0$};
+    \node (p1s2) [right of=p1s1] {$0$};
+    \node (p1s3) [right of=p1s2] {$0$};
+    \node (p1s4) [right of=p1s3] {$0$};
+    \path (p1s0) edge [above] node {$a$} (p1s1)
+          (p1s1) edge [above] node {$b$} (p1s2)
+          (p1s2) edge [above] node {$a$} (p1s3)
+          (p1s3) edge [above] node {$b$} (p1s4);
+    \node [right of=p1s4, xshift=-0.5cm] {\small (not accepting)};
+
+    % Path 2: 0 -a-> 0 -b-> 0 -a-> 1 -b-> 2
+    \node (p2s0) [below of=p1s0, yshift=-0.5cm] {$0$};
+    \node (p2s1) [right of=p2s0] {$0$};
+    \node (p2s2) [right of=p2s1] {$0$};
+    \node (p2s3) [right of=p2s2] {$1$};
+    \node[accepting] (p2s4) [right of=p2s3] {$2$};
+    \path (p2s0) edge [above] node {$a$} (p2s1)
+          (p2s1) edge [above] node {$b$} (p2s2)
+          (p2s2) edge [above] node {$a$} (p2s3)
+          (p2s3) edge [above] node {$b$} (p2s4);
+    \node [right of=p2s4, xshift=-0.3cm] {\small \textbf{(accepting~$\checkmark$)}};
+  \end{tikzpicture}
+  \caption{All complete paths in $\mathcal{A}$ for $v = abab$}
+\end{figure}
+
+Path~1 just loops in state~$0$ the whole time and ends there---not an accepting state. Path~2 jumps to state~$1$ on the third letter ($a$) and then lands in the accepting state~$2$ on the fourth letter ($b$). There is also a branch $0 \xrightarrow{a} 1 \xrightarrow{b} 2$ that dies after only two symbols (state~$2$ has no arrows out), so we leave it out. Because at least one path reaches an accepting state, $v = abab$ is \textbf{accepted}.
+
+\textbf{Question 4: Construct the determinization $\mathcal{A}^D$ using the power set construction.}
+
+The idea is to track which NFA states could be active at the same time. Each DFA state is a \emph{set} of NFA states. Starting from $\{0\}$, we build the table row by row, only adding sets we haven't seen yet:
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    State & $a$ & $b$ & $c$ & Accepting? \\ \hline
+    $\{0\}$ & $\{0,1\}$ & $\{0\}$ & $\emptyset$ & No \\ \hline
+    $\{0,1\}$ & $\{0,1\}$ & $\{0,2\}$ & $\{3\}$ & No \\ \hline
+    $\{0,2\}$ & $\{0,1\}$ & $\{0\}$ & $\emptyset$ & Yes \\ \hline
+    $\{3\}$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & Yes \\ \hline
+    $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & No \\ \hline
+  \end{tabular}
+  \caption{Transition table for $\mathcal{A}^D$}
+\end{table}
+
+We start in $\{0\}$. A set is accepting whenever it contains an original accepting state ($2$ or $3$), so the accepting states are $\{0,2\}$ and $\{3\}$.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=3cm, ->, >=stealth]
+    \node[state, initial] (s0) {$\{0\}$};
+    \node[state] (s01) [right of=s0] {$\{0,1\}$};
+    \node[state, accepting] (s02) [right of=s01] {$\{0,2\}$};
+    \node[state, accepting] (s3) [below of=s01] {$\{3\}$};
+    \node[state] (se) [right of=s3] {$\emptyset$};
+    % Transitions
+    \path (s0)  edge [above] node {$a$} (s01)
+                edge [loop above] node {$b$} (s0)
+                edge [bend right=15, left] node {$c$} (se);
+    \path (s01) edge [loop above] node {$a$} (s01)
+                edge [above] node {$b$} (s02)
+                edge [left] node {$c$} (s3);
+    \path (s02) edge [bend left=20, above] node {$a$} (s01)
+                edge [bend right=40, below] node {$b$} (s0)
+                edge [right] node {$c$} (se);
+    \path (s3)  edge [below] node {$a,b,c$} (se);
+    \path (se)  edge [loop right] node {$a,b,c$} (se);
+  \end{tikzpicture}
+  \caption{Determinized DFA $\mathcal{A}^D$}
+\end{figure}
+
+\subsubsection{Problem 2}
+
+\textbf{Homework prompt:} For the alphabet $\Sigma = \{0, 1\}$, consider the following NFA $\mathcal{A}$:
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm, ->, >=stealth]
+    \node[state, initial] (q0) {$q_0$};
+    \node[state] (q1) [right of=q0] {$q_1$};
+    \node[state] (q2) [right of=q1] {$q_2$};
+    \node[state, accepting] (q3) [right of=q2] {$q_3$};
+    \path (q0) edge [loop above] node {$0,1$} (q0)
+               edge [above] node {$1$} (q1)
+          (q1) edge [above] node {$0$} (q2)
+          (q2) edge [above] node {$0$} (q3)
+               edge [bend left=40, below] node {$1$} (q1)
+          (q3) edge [loop above] node {$0,1$} (q3);
+  \end{tikzpicture}
+  \caption{NFA $\mathcal{A}$ over $\Sigma = \{0,1\}$}
+\end{figure}
+
+This NFA accepts any binary string that contains $100$ somewhere inside it.
+
+\textbf{Question 1: Construct the determinization $\mathcal{A}^D$ using the power set construction.}
+
+Again we track which NFA states can be active simultaneously. Starting from $\{q_0\}$:
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{|c|c|c|c|}
+    \hline
+    State & $0$ & $1$ & Accepting? \\ \hline
+    $\{q_0\}$ & $\{q_0\}$ & $\{q_0, q_1\}$ & No \\ \hline
+    $\{q_0, q_1\}$ & $\{q_0, q_2\}$ & $\{q_0, q_1\}$ & No \\ \hline
+    $\{q_0, q_2\}$ & $\{q_0, q_3\}$ & $\{q_0, q_1\}$ & No \\ \hline
+    $\{q_0, q_3\}$ & $\{q_0, q_3\}$ & $\{q_0, q_1, q_3\}$ & Yes \\ \hline
+    $\{q_0, q_1, q_3\}$ & $\{q_0, q_2, q_3\}$ & $\{q_0, q_1, q_3\}$ & Yes \\ \hline
+    $\{q_0, q_2, q_3\}$ & $\{q_0, q_3\}$ & $\{q_0, q_1, q_3\}$ & Yes \\ \hline
+  \end{tabular}
+  \caption{Transition table for $\mathcal{A}^D$}
+\end{table}
+
+We start in $\{q_0\}$. Any set containing $q_3$ is accepting: $\{q_0,q_3\}$, $\{q_0,q_1,q_3\}$, and $\{q_0,q_2,q_3\}$.
+
+To keep the diagram readable, we use short names: $A = \{q_0\}$, $B = \{q_0,q_1\}$, $C = \{q_0,q_2\}$, $D = \{q_0,q_3\}$, $E = \{q_0,q_1,q_3\}$, $F = \{q_0,q_2,q_3\}$.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.8cm, ->, >=stealth]
+    % Non-accepting row
+    \node[state, initial] (A) {$A$};
+    \node[state] (B) [right of=A] {$B$};
+    \node[state] (C) [right of=B] {$C$};
+    % Accepting row
+    \node[state, accepting] (D) [below of=C] {$D$};
+    \node[state, accepting] (E) [left of=D] {$E$};
+    \node[state, accepting] (F) [left of=E] {$F$};
+    % Transitions
+    \path (A) edge [loop above] node {$0$} (A)
+              edge [above] node {$1$} (B);
+    \path (B) edge [above] node {$0$} (C)
+              edge [loop above] node {$1$} (B);
+    \path (C) edge [right] node {$0$} (D)
+              edge [bend right=15, below] node {$1$} (B);
+    \path (D) edge [loop right] node {$0$} (D)
+              edge [below] node {$1$} (E);
+    \path (E) edge [below] node {$0$} (F)
+              edge [loop below] node {$1$} (E);
+    \path (F) edge [bend left=15, right] node {$0$} (D)
+              edge [above] node {$1$} (E);
+  \end{tikzpicture}
+  \caption{Determinized DFA $\mathcal{A}^D$ (6~states)}
+\end{figure}
+
+\textbf{Question 2: Is there a smaller DFA accepting the same language as $\mathcal{A}^D$?}
+
+Yes. We can merge states that behave identically. The basic idea: start by grouping states into ``accepting'' vs.\ ``non-accepting,'' then keep splitting any group whose members disagree on where they go.
+
+\emph{Step~1.} Two initial groups: $\{A, B, C\}$ (non-accepting) and $\{D, E, F\}$ (accepting).
+
+\emph{Step~2.} Look at $\{A, B, C\}$: on input~$0$, both $A$ and $B$ stay in the non-accepting group, but $C$ jumps to $D$ (accepting). So $C$ doesn't belong with the others. New groups: $\{A, B\}$, $\{C\}$, $\{D, E, F\}$.
+
+\emph{Step~3.} Look at $\{A, B\}$: on input~$0$, $A$ goes to $A$ (same group) but $B$ goes to $C$ (different group). Split again: $\{A\}$, $\{B\}$. The accepting group $\{D, E, F\}$ needs no splitting---all three states go to the same groups on every input.
+
+\emph{Step~4.} Nothing left to split. Final groups: $\{A\},\; \{B\},\; \{C\},\; \{D,E,F\}$.
+
+Each group becomes one state in the minimal DFA, giving us \textbf{4~states}:
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.8cm, ->, >=stealth]
+    \node[state, initial] (s0) {$s_0$};
+    \node[state] (s1) [right of=s0] {$s_1$};
+    \node[state] (s2) [right of=s1] {$s_2$};
+    \node[state, accepting] (s3) [right of=s2] {$s_3$};
+    \path (s0) edge [loop above] node {$0$} (s0)
+               edge [above] node {$1$} (s1);
+    \path (s1) edge [above] node {$0$} (s2)
+               edge [loop above] node {$1$} (s1);
+    \path (s2) edge [above] node {$0$} (s3)
+               edge [bend left=30, below] node {$1$} (s1);
+    \path (s3) edge [loop above] node {$0,1$} (s3);
+  \end{tikzpicture}
+  \caption{Minimal DFA for $L(\mathcal{A})$ (4~states)}
+\end{figure}
+
+Each state has a simple meaning:
+\begin{itemize}
+  \item $s_0$: haven't started matching $100$ yet.
+  \item $s_1$: just read a~$1$ (first character of $100$).
+  \item $s_2$: just read $10$ (two characters matched).
+  \item $s_3$: already saw $100$---accept everything from here on.
+\end{itemize}
+No further merging is possible because each non-accepting state reacts differently to at least one input, so 4~states is the smallest this DFA can be.
+
 
 \section{Evidence of Participation}
 
