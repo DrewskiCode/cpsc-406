@@ -752,6 +752,116 @@ Each state has a simple meaning:
 \end{itemize}
 No further merging is possible because each non-accepting state reacts differently to at least one input, so 4~states is the smallest this DFA can be.
 
+\subsection{Week 4}
+
+\subsubsection{Exercise 1: Kleene's Algorithm}
+
+\textbf{Homework prompt:} Consider the following DFA with states $p$ and $q$:
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm, ->, >=stealth]
+    \node[state, initial, accepting] (p) {$p$};
+    \node[state, accepting] (q) [right of=p] {$q$};
+    \path (p) edge [loop above] node {$a$} (p)
+             edge [above] node {$b$} (q)
+        (q) edge [above] node {$a$} (p)
+             edge [loop above] node {$b$} (q);
+  \end{tikzpicture}
+  \caption{DFA for Kleene's algorithm exercise}
+\end{figure}
+
+For states $p = 1$ and $q = 2$, compute via Kleene's algorithm all regular expressions $R_{ij}^{(k)}$ for $i,j \in \{1,2\}$ and $k=0,1,2$, then write the final regular expression $R$ describing $L(\mathcal{A})$.
+
+\textbf{Solution using Kleene's Algorithm:}
+
+The idea of Kleene's algorithm is to build regular expressions step-by-step, where $R_{ij}^{(k)}$ is the regex for all strings that take you from state $i$ to state $j$, using any of the first $k$ states as intermediates (but not as start or end).
+
+\textbf{Step 0: Direct transitions (no intermediates allowed)}
+
+These are just the direct arrows in the diagram:
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|c|c|c|}
+    \hline
+    & $\to 1$ & $\to 2$ \\ \hline
+    From 1 & $a$ & $b$ \\ \hline
+    From 2 & $a$ & $b$ \\ \hline
+  \end{tabular}
+  \caption{Base case: $R_{ij}^{(0)}$}
+\end{table}
+
+Formally:
+\begin{itemize}
+  \item $R_{11}^{(0)} = a$
+  \item $R_{12}^{(0)} = b$
+  \item $R_{21}^{(0)} = a$
+  \item $R_{22}^{(0)} = b$
+\end{itemize}
+
+\textbf{Step 1: Using state 1 as an intermediate}
+
+Now we can loop through state 1. The formula is: $R_{ij}^{(1)} = R_{ij}^{(0)} \,\, | \,\, R_{i1}^{(0)} (R_{11}^{(0)})^* R_{1j}^{(0)}$.
+
+This means: either take the direct path, or go to state 1, loop there as much as you want, then leave toward state $j$.
+
+\begin{itemize}
+  \item $R_{11}^{(1)} = a \,\, | \,\, a(a)^*a = a(1 \,|\, a^*) = a^+$
+  \item $R_{12}^{(1)} = b \,\, | \,\, a(a)^*b = b \,\, | \,\, a^+b = a^*b$ (either $b$ directly, or loop at 1 first)
+  \item $R_{21}^{(1)} = a \,\, | \,\, a(a)^*a = a^+$
+  \item $R_{22}^{(1)} = b \,\, | \,\, a(a)^*b = a^*b$
+\end{itemize}
+
+\textbf{Step 2: Using states 1 and 2 as intermediates}
+
+Now we can use both states. The formula is: $R_{ij}^{(2)} = R_{ij}^{(1)} \,\, | \,\, R_{i2}^{(1)} (R_{22}^{(1)})^* R_{2j}^{(1)}$.
+
+This means: either use the paths from Step 1, or detour through state 2 (looping there as much as you want).
+
+\begin{itemize}
+  \item $R_{11}^{(2)} = a^+ \,\, | \,\, (a^*b)(a^*b)^*(a^+) = a^+ \,\, | \,\, a^*b(a^*b)^*a^+$
+  \item $R_{12}^{(2)} = a^*b \,\, | \,\, (a^*b)(a^*b)^*(a^+) = a^*b(1 \,\, | \,\, (a^*b)^*a^+)$
+  \item $R_{21}^{(2)} = a^+ \,\, | \,\, (a^*b)(a^*b)^*(a^+) = a^+ \,\, | \,\, a^*b(a^*b)^*a^+$
+  \item $R_{22}^{(2)} = a^*b \,\, | \,\, (a^*b)(a^*b)^*(a^+) = a^*b(1 \,\, | \,\, (a^*b)^*a^+)$
+\end{itemize}
+
+\textbf{Final Language:}
+
+Since we start at state $p = 1$ and both states are accepting, the language is all strings that end in an accepting state:
+
+\[
+L(\mathcal{A}) = R_{11}^{(2)} \,\, | \,\, R_{12}^{(2)} \,\, | \,\, \varepsilon
+\]
+
+where $\varepsilon$ is included because state 1 is accepting and it's the starting state.
+
+Substituting:
+\[
+L(\mathcal{A}) = (a^+ \,\, | \,\, a^*b(a^*b)^*a^+) \,\, | \,\, a^*b \,\, | \,\, \varepsilon
+\]
+
+Simplifying by grouping:
+\[
+L(\mathcal{A}) = \varepsilon \,\, | \,\, a^+ \,\, | \,\, a^*b \,\, | \,\, a^*b(a^*b)^*a^+
+\]
+
+\textbf{Interpretation:}
+
+This regular expression describes four types of accepted strings:
+\begin{enumerate}
+  \item $\varepsilon$: the empty string (start at state 1, which is accepting)
+  \item $a^+$: one or more $a$'s (loop at state 1)
+  \item $a^*b$: any number of $a$'s, then $b$ (reach state 2, which is accepting)
+  \item $a^*b(a^*b)^*a^+$: any number of $(a^*b)$ pairs, then at least one $a$ (repeatedly bounce between states via the 1 $\xrightarrow{b}$ 2 and 2 $\xrightarrow{a}$ 1 path)
+\end{enumerate}
+
+In plain language, the machine accepts any combination of $a$'s and $b$'s that includes:
+- only $a$'s
+- $a$'s followed by $b$'s
+- alternating patterns of $a$'s and $b$'s
+
+Since both accepting states are reachable and cover most possible strings, the language is quite permissive.
 
 \section{Evidence of Participation}
 
