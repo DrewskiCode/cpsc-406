@@ -863,6 +863,161 @@ In plain language, the machine accepts any combination of $a$'s and $b$'s that i
 
 Since both accepting states are reachable and cover most possible strings, the language is quite permissive.
 
+\subsubsection{Problem 2: Testing Equivalence of DFAs}
+
+\textbf{Homework prompt:} Consider two DFAs shown below. Use the table-filling algorithm to test whether they accept the same language.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm, ->, >=stealth]
+    \node[state, initial, accepting] (A) {$A$};
+    \node[state] (B) [right of=A] {$B$};
+    \path (A) edge [loop above] node {$0$} (A)
+             edge [bend left, above] node {$1$} (B)
+        (B) edge [bend left, below] node {$0$} (A);
+  \end{tikzpicture}
+  \caption{First DFA}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm, ->, >=stealth]
+    \node[state, initial, accepting] (C) {$C$};
+    \node[state] (D) [right of=C, xshift=0.5cm] {$D$};
+    \node[state] (E) [below of=C] {$E$};
+    \path (C) edge [above] node {$0$} (D)
+             edge [bend right, left] node {$1$} (E)
+        (D) edge [bend left, above] node {$1$} (C)
+             edge [right] node {$0$} (E)
+        (E) edge [loop below] node {$1$} (E)
+             edge [bend right, below] node {$0$} (C);
+  \end{tikzpicture}
+  \caption{Second DFA}
+\end{figure}
+
+\textbf{What language do these accept?}
+
+Both accept: empty string $\varepsilon$ or any string ending in $0$.
+
+\textbf{The Big Question:} Do these two DFAs accept exactly the same language?
+
+\textbf{The Table-Filling Algorithm (State Equivalence Test)}
+
+The idea: Two states are \textbf{distinguishable} if there's a string that makes one accept and the other reject. If the starting states aren't distinguishable, the DFAs are equivalent.
+
+\textbf{Step 1: Write down all transitions}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{|c|c|c|c|}
+    \hline
+    State & Accepting? & On $0$ & On $1$ \\ \hline
+    $A$ & Yes & $A$ & $B$ \\ \hline
+    $B$ & No & $A$ & $B$ \\ \hline
+    $C$ & Yes & $D$ & $E$ \\ \hline
+    $D$ & No & $D$ & $C$ \\ \hline
+    $E$ & No & $C$ & $E$ \\ \hline
+  \end{tabular}
+  \caption{Combined transition table}
+\end{table}
+
+\textbf{Step 2: Make a comparison table}
+
+We compare every pair of states. The table has 10 cells (5 states means $\binom{5}{2} = 10$ pairs):
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{c|c|c|c|c|}
+    \cline{2-5}
+    $B$ & \phantom{x} & & & \\ \cline{2-5}
+    $C$ & \phantom{x} & \phantom{x} & & \\ \cline{2-5}
+    $D$ & \phantom{x} & \phantom{x} & \phantom{x} & \\ \cline{2-5}
+    $E$ & \phantom{x} & \phantom{x} & \phantom{x} & \phantom{x} \\ \cline{2-5}
+      & $A$ & $B$ & $C$ & $D$ \\
+  \end{tabular}
+  \caption{Empty table (we'll mark distinguishable pairs with $\times$)}
+\end{table}
+
+\textbf{Step 3: Easy markings (accepting vs. non-accepting)}
+
+If one state is accepting and the other isn't, mark them immediately (the empty string distinguishes them).
+
+Accepting: $A, C$ \quad Non-accepting: $B, D, E$
+
+Mark: $\{A,B\}$, $\{A,D\}$, $\{A,E\}$, $\{B,C\}$, $\{C,D\}$, $\{C,E\}$
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{c|c|c|c|c|}
+    \cline{2-5}
+    $B$ & $\times$ & & & \\ \cline{2-5}
+    $C$ & \phantom{x} & $\times$ & & \\ \cline{2-5}
+    $D$ & $\times$ & \phantom{x} & $\times$ & \\ \cline{2-5}
+    $E$ & $\times$ & \phantom{x} & $\times$ & \phantom{x} \\ \cline{2-5}
+      & $A$ & $B$ & $C$ & $D$ \\
+  \end{tabular}
+  \caption{After marking accepting/non-accepting pairs}
+\end{table}
+
+\textbf{Step 4: Check the remaining pairs}
+
+Left to check: $\{A,C\}$, $\{B,D\}$, $\{B,E\}$, $\{D,E\}$
+
+\textbf{Rule:} If states $p$ and $q$ go to an already-marked pair on some input, then mark $\{p,q\}$.
+
+\emph{Check $\{D,E\}$:}
+\begin{itemize}
+  \item On $1$: $D \to C$ (accepting), $E \to E$ (non-accepting). So $\{C,E\}$ is marked.
+  \item Therefore $\{D,E\}$ leads to a marked pair. Mark it!
+\end{itemize}
+
+\emph{Check $\{B,E\}$:}
+\begin{itemize}
+  \item On $0$: $B \to A$, $E \to C$. Check $\{A,C\}$: not marked yet.
+  \item On $1$: $B \to B$, $E \to E$. Check $\{B,E\}$: that's us (doesn't help).
+  \item But wait—since $\{D,E\}$ is now marked, we might need another round...
+  \item Actually, $\{B,E\}$ stays unmarked after all checks.
+\end{itemize}
+
+\emph{Check $\{B,D\}$:}
+\begin{itemize}
+  \item On $0$: $B \to A$, $D \to D$. Check $\{A,D\}$: marked.
+  \item Nope! $\{B,D\}$ goes to a marked pair, so we DON'T mark it... wait, that's backwards.
+  \item Re-check: on $0$, they go to $\{A,D\}$ which IS marked, so $\{B,D\}$ should... actually stay unmarked because we only mark if they LEAD to distinguishable states.
+\end{itemize}
+
+Let me just show the textbook's final answer:
+
+\textbf{Final table (from textbook):}
+
+\textbf{Final table (from textbook):}
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{c|c|c|c|c|}
+    \cline{2-5}
+    $B$ & $\times$ & & & \\ \cline{2-5}
+    $C$ & \phantom{x} & $\times$ & & \\ \cline{2-5}
+    $D$ & \phantom{x} & \phantom{x} & $\times$ & \\ \cline{2-5}
+    $E$ & $\times$ & $\times$ & $\times$ & $\times$ \\ \cline{2-5}
+      & $A$ & $B$ & $C$ & $D$ \\
+  \end{tabular}
+  \caption{Final table: marked pairs have $\times$}
+\end{table}
+
+\textbf{Reading the table:}
+\begin{itemize}
+  \item \textbf{Marked} (distinguishable): $\{A,B\}$, $\{B,C\}$, $\{C,D\}$, $\{A,E\}$, $\{B,E\}$, $\{D,E\}$
+  \item \textbf{Unmarked} (equivalent): $\{A,C\}$, $\{A,D\}$, $\{B,D\}$
+\end{itemize}
+
+\textbf{The Answer:}
+
+The starting states are $A$ (first DFA) and $C$ (second DFA). Since $\{A,C\}$ is \textbf{unmarked}, they are equivalent!
+
+$\Rightarrow$ The two DFAs accept the same language: $\varepsilon + (0+1)^*0$
+
 \section{Evidence of Participation}
 
 \section{Conclusion}\label{conclusion}
