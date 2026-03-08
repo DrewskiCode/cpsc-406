@@ -752,6 +752,43 @@ Each state has a simple meaning:
 \end{itemize}
 No further merging is possible because each non-accepting state reacts differently to at least one input, so 4~states is the smallest this DFA can be.
 
+\subsubsection{Problem 3: Induction Proof on a DFA State}
+
+\textbf{Exercise 2.2.7.} Let $A$ be a DFA and let $q$ be a state such that
+\[
+\delta(q,a)=q \quad \text{for every input symbol } a.
+\]
+Show (by induction on $|w|$) that for every string $w$, we have
+\[
+\hat{\delta}(q,w)=q.
+\]
+
+\textbf{Simple proof:}
+
+We prove: for all strings $w$, starting from $q$ and reading $w$ keeps us at $q$.
+
+\textbf{Base case ($|w|=0$):} 
+Then $w=\varepsilon$. By definition of extended transition,
+\[
+\hat{\delta}(q,\varepsilon)=q.
+\]
+So the claim is true for length $0$.
+
+\textbf{Induction step:}
+Assume the claim is true for all strings of length $n$. Let $x$ be any string of length $n+1$.
+Write $x=wa$ where $|w|=n$ and $a\in\Sigma$.
+Then
+\[
+\hat{\delta}(q,x)=\hat{\delta}(q,wa)=\delta(\hat{\delta}(q,w),a).
+\]
+By induction hypothesis, $\hat{\delta}(q,w)=q$, so
+\[
+\delta(\hat{\delta}(q,w),a)=\delta(q,a)=q.
+\]
+Therefore $\hat{\delta}(q,x)=q$.
+
+So the statement holds for length $n+1$. By induction, it holds for all $w\in\Sigma^*$.
+
 \subsection{Week 4}
 
 \subsubsection{Exercise 1: Kleene's Algorithm}
