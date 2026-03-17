@@ -1055,6 +1055,101 @@ The starting states are $A$ (first DFA) and $C$ (second DFA). Since $\{A,C\}$ is
 
 $\Rightarrow$ The two DFAs accept the same language: $\varepsilon + (0+1)^*0$
 
+\subsection{Week 5}
+
+\subsubsection{Homework 5: Problems on the Pumping Lemma}
+
+Show that the following languages are not regular:
+\[
+L_1=\{a^n b^m\mid n,m\in\mathbb{N},\ n>m\ge 0\},\quad
+L_2=\{a^{n^2}\mid n\in\mathbb{N},\ n\ge 1\},
+\]
+\[
+L_3=\{a^p\mid p\in\mathbb{N},\ p\text{ is prime}\},\quad
+L_4=\{a^k b^m a^{k+m}\mid k,m\ge 0\}.
+\]
+
+\textbf{Reminder (Pumping Lemma):} If a language $L$ is regular, then there is a pumping length $p$ such that every string $s\in L$ with $|s|\ge p$ can be written as $s=xyz$ with:
+\[
+|xy|\le p,\quad |y|\ge 1,\quad \text{and }xy^iz\in L\text{ for all }i\ge 0.
+\]
+
+\paragraph{$L_1=\{a^n b^m\mid n>m\ge 0\}$ is not regular.}
+Assume $L_1$ is regular and let $p$ be its pumping length.
+Choose
+\[
+s=a^{p+1}b^p\in L_1
+\]
+because $p+1>p$.
+
+For any split $s=xyz$ with $|xy|\le p$ and $|y|\ge 1$, the substring $y$ is only $a$'s (it is inside the first $p$ symbols). Write $y=a^t$ with $t\ge 1$.
+
+Pump down with $i=0$:
+\[
+xz=a^{p+1-t}b^p.
+\]
+Now the number of $a$'s is $p+1-t\le p$, while the number of $b$'s is $p$. So we do \emph{not} have $n>m$ anymore. Hence $xz\notin L_1$, contradiction.
+
+So $L_1$ is not regular.
+
+\paragraph{$L_2=\{a^{n^2}\mid n\ge 1\}$ is not regular.}
+Assume $L_2$ is regular, with pumping length $p$.
+Choose
+\[
+s=a^{p^2}\in L_2.
+\]
+For any split $s=xyz$ with $|xy|\le p$, $|y|\ge 1$, we have $y=a^t$ for some $1\le t\le p$.
+
+Pump up with $i=2$:
+\[
+|xy^2z|=p^2+t.
+\]
+Since $1\le t\le p$,
+\[
+p^2 < p^2+t \le p^2+p < p^2+2p+1=(p+1)^2.
+\]
+So $p^2+t$ is strictly between two consecutive squares, hence not a square. Therefore $xy^2z\notin L_2$, contradiction.
+
+So $L_2$ is not regular.
+
+\paragraph{$L_3=\{a^p\mid p\text{ prime}\}$ is not regular.}
+Assume $L_3$ is regular with pumping length $p$.
+Pick a prime number $q>p$ and let
+\[
+s=a^q\in L_3.
+\]
+For any split $s=xyz$ with $|xy|\le p$, $|y|\ge 1$, write $y=a^t$ with $1\le t\le p$.
+
+Choose pumping index $i=q+1$. Then
+\[
+|xy^{q+1}z|=q+(q)t=q(1+t).
+\]
+Because $q\ge 2$ and $1+t\ge 2$, this length is composite, not prime. So $xy^{q+1}z\notin L_3$, contradiction.
+
+So $L_3$ is not regular.
+
+\paragraph{$L_4=\{a^k b^m a^{k+m}\mid k,m\ge 0\}$ is not regular.}
+Assume $L_4$ is regular with pumping length $p$.
+Choose
+\[
+s=a^p b^p a^{2p}\in L_4
+\]
+by taking $k=p$, $m=p$.
+
+For any split $s=xyz$ with $|xy|\le p$ and $|y|\ge 1$, $y$ lies in the first block of $a$'s, so $y=a^t$ with $t\ge 1$.
+
+Pump down with $i=0$:
+\[
+xz=a^{p-t}b^pa^{2p}.
+\]
+In this new string, the first block has length $k'=p-t$ and middle block has length $m'=p$. If it were in $L_4$, the last block would have to be
+\[
+k'+m'=(p-t)+p=2p-t,
+\]
+but the actual last block length is $2p$. Not equal. So $xz\notin L_4$, contradiction.
+
+So $L_4$ is not regular.
+
 \section{Evidence of Participation}
 
 \section{Conclusion}\label{conclusion}
