@@ -1150,6 +1150,271 @@ but the actual last block length is $2p$. Not equal. So $xz\notin L_4$, contradi
 
 So $L_4$ is not regular.
 
+\subsection{Week 6}
+
+\subsubsection{Homework 6: Turing Machines on Binary Strings}
+
+We use the language
+\[
+L=\{10^n \mid n\in\mathbb{N}\}.
+\]
+That means: a valid string starts with one $1$, and after that has only $0$'s.
+
+\paragraph{Part 1. Accept $L$ and output $10^{n+1}$ for input $10^n$.}
+\textbf{Simple TM idea:}
+\begin{enumerate}
+  \item Start at the left end. If first symbol is not $1$, reject.
+  \item Move right. While reading $0$, keep moving right.
+  \item If you see another $1$ after the first symbol, reject.
+  \item When you reach blank, write one $0$ and halt-accept.
+\end{enumerate}
+
+Why this works: if input is $10^n$, the head reaches the end and adds one more $0$, so result is $10^{n+1}$.
+
+\paragraph{Part 2. Accept $L$ and output $1$ for input $10^n$.}
+\textbf{Simple TM idea:}
+\begin{enumerate}
+  \item First, do the same check as Part 1 (must be one $1$ followed only by $0$'s). If not, reject.
+  \item Move head back to the first cell.
+  \item Keep the first $1$.
+  \item Move right and change every $0$ to blank until end of string.
+  \item Halt-accept.
+\end{enumerate}
+
+Why this works: all zeros are erased, so only $1$ remains.
+
+\paragraph{Part 3. Accept all binary strings and swap every $0$ and $1$.}
+Language here is $\{0,1\}^*$ (all binary strings).
+
+\textbf{Simple TM idea:}
+\begin{enumerate}
+  \item Start at left end.
+  \item If symbol is $0$, write $1$ and move right.
+  \item If symbol is $1$, write $0$ and move right.
+  \item If symbol is blank, halt-accept.
+\end{enumerate}
+
+Why this works: each bit is flipped exactly once, so the output is the input with 0/1 swapped everywhere.
+
+\subsubsection{Homework 6: Turing Machines on Binary Strings (Exercise B)}
+
+\paragraph{Part 1. Unary addition on input $10^n10^m$, output $10^n10^m10^{n+m}$.}
+Language:
+\[
+L=\{10^n10^m\mid n,m\in\mathbb{N}\}.
+\]
+
+\textbf{Simple TM idea:}
+\begin{enumerate}
+  \item First, verify the format is one $1$, then zeros, then one $1$, then zeros. If not, reject.
+  \item Move to the first $0$ block. For each unmarked $0$, mark it as $X$, go to the end, and write a new $0$.
+  \item Return and do the same for the second $0$ block (mark each used $0$ as $Y$).
+  \item Restore $X\to 0$ and $Y\to 0$, then halt-accept.
+\end{enumerate}
+
+Why this works: one new $0$ is appended for every $0$ in both blocks, so the last block has length $n+m$.
+
+\paragraph{Part 2. Double any binary string: input $w$, output $ww$.}
+Language accepted: $\{0,1\}^*$.
+
+\textbf{Simple TM idea:}
+\begin{enumerate}
+  \item Scan from left to right for an unmarked symbol.
+  \item If it is $0$, mark it (say $X$), go to end, write $0$; if it is $1$, mark it (say $Y$), go to end, write $1$.
+  \item Return to the left and repeat until all original symbols are marked.
+  \item Restore marks $X\to 0$, $Y\to 1$, then halt-accept.
+\end{enumerate}
+
+Why this works: the machine copies each original symbol to the end in the same order, so final tape is exactly $ww$.
+
+\subsubsection{Homework 6: Turing Machines on Binary Strings (Exercise C)}
+
+\textbf{Transition diagrams (simple/high-level) for the previous parts:}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.7cm, ->, >=stealth]
+    \node[state, initial] (q0) {$q_0$};
+    \node[state] (q1) [right of=q0] {$q_1$};
+    \node[state, accepting] (qa) [right of=q1] {$q_{acc}$};
+    \node[state] (qr) [below of=q1] {$q_{rej}$};
+
+    \path (q0) edge [above] node {$1/1,R$} (q1)
+              edge [below left] node {$0,\square$} (qr);
+    \path (q1) edge [loop above] node {$0/0,R$} (q1)
+              edge [above] node {$\square/0,S$} (qa)
+              edge [right] node {$1$} (qr);
+  \end{tikzpicture}
+  \caption{Exercise A1: accept $10^n$ and append one $0$}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.6cm, ->, >=stealth]
+    \node[state, initial] (q0) {$q_0$};
+    \node[state] (qv) [right of=q0] {$q_{check}$};
+    \node[state] (qe) [right of=qv] {$q_{erase}$};
+    \node[state, accepting] (qa) [right of=qe] {$q_{acc}$};
+    \node[state] (qr) [below of=qv] {$q_{rej}$};
+
+    \path (q0) edge [above] node {$1/1,R$} (qv)
+              edge [below left] node {$0,\square$} (qr);
+    \path (qv) edge [loop above] node {$0/0,R$} (qv)
+              edge [above] node {$\square/\square,L$} (qe)
+              edge [right] node {$1$} (qr);
+    \path (qe) edge [loop above] node {$0/\square,L$} (qe)
+              edge [above] node {$1/1,S$} (qa);
+  \end{tikzpicture}
+  \caption{Exercise A2: accept $10^n$ and erase zeros to output $1$}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=3cm, ->, >=stealth]
+    \node[state, initial] (q0) {$q_0$};
+    \node[state, accepting] (qa) [right of=q0] {$q_{acc}$};
+
+    \path (q0) edge [loop above] node {$0/1,R\ ;\ 1/0,R$} (q0)
+              edge [above] node {$\square/\square,S$} (qa);
+  \end{tikzpicture}
+  \caption{Exercise A3: swap every $0$ and $1$}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.5cm, ->, >=stealth]
+    \node[state, initial] (q0) {$q_0$};
+    \node[state] (q1) [right of=q0] {$q_{fmt}$};
+    \node[state] (q2) [right of=q1] {$q_{copy1}$};
+    \node[state] (q3) [right of=q2] {$q_{copy2}$};
+    \node[state] (q4) [right of=q3] {$q_{restore}$};
+    \node[state, accepting] (qa) [right of=q4] {$q_{acc}$};
+    \node[state] (qr) [below of=q2] {$q_{rej}$};
+
+    \path (q0) edge [above] node {start} (q1);
+    \path (q1) edge [above] node {valid} (q2)
+              edge [left] node {invalid} (qr);
+    \path (q2) edge [above] node {done first block} (q3);
+    \path (q3) edge [above] node {done second block} (q4);
+    \path (q4) edge [above] node {restore $X,Y$} (qa);
+  \end{tikzpicture}
+  \caption{Exercise B1: unary addition $10^n10^m\mapsto 10^n10^m10^{n+m}$ (high-level flow)}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=2.8cm, ->, >=stealth]
+    \node[state, initial] (q0) {$q_0$};
+    \node[state] (q1) [right of=q0] {$q_{pick}$};
+    \node[state] (q2) [right of=q1] {$q_{append}$};
+    \node[state] (q3) [right of=q2] {$q_{back}$};
+    \node[state] (q4) [right of=q3] {$q_{restore}$};
+    \node[state, accepting] (qa) [right of=q4] {$q_{acc}$};
+
+    \path (q0) edge [above] node {start} (q1);
+    \path (q1) edge [above] node {mark next $0/1$} (q2)
+              edge [bend left=20, below] node {none left} (q4);
+    \path (q2) edge [above] node {write same bit at end} (q3);
+    \path (q3) edge [bend left=20, above] node {return left} (q1);
+    \path (q4) edge [above] node {$X\to0,\ Y\to1$} (qa);
+  \end{tikzpicture}
+  \caption{Exercise B2: doubling binary string $w\mapsto ww$ (high-level flow)}
+\end{figure}
+
+\subsubsection{Homework 6: Turing Machines on Binary Strings (Exercise D)}
+
+\textbf{Given prompt:} accept binary strings that contain at least one $1$, and do not halt.
+
+\textbf{Short note:}
+With the standard TM definition, an \emph{accept} state is halting. So "accept and never halt" is not possible in the strict sense.
+
+The usual intended version is:
+\begin{itemize}
+  \item If input has at least one $1$, go to an accept state.
+  \item If input has no $1$ (only $0$'s or empty), loop forever.
+\end{itemize}
+
+\textbf{Simple transition diagram (recognizer version):}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=3cm, ->, >=stealth]
+    \node[state, initial] (q0) {$q_0$};
+    \node[state, accepting] (qa) [right of=q0] {$q_{acc}$};
+    \node[state] (ql) [below of=q0] {$q_{loop}$};
+
+    \path (q0) edge [above] node {$1/1,S$} (qa)
+              edge [loop above] node {$0/0,R$} (q0)
+              edge [left] node {$\square/\square,S$} (ql);
+    \path (ql) edge [loop below] node {$0/0,S,\ 1/1,S,\ \square/\square,S$} (ql);
+  \end{tikzpicture}
+  \caption{Exercise D: accepts strings with at least one $1$, loops otherwise}
+\end{figure}
+
+\subsubsection{Homework 6: Turing Machines on Binary Strings (Exercise E)}
+
+\paragraph{Part 1. Multitape TM: input $w\in\{0,1\}^*$, output $0^n1^m$.}
+Here, $n$ is the number of $0$'s in $w$, and $m$ is the number of $1$'s.
+
+\textbf{Simple 3-tape idea:}
+\begin{itemize}
+  \item Tape 1: input $w$ (read only).
+  \item Tape 2: counter/output for $0$'s (write one $0$ each time Tape 1 reads a $0$).
+  \item Tape 3: counter/output for $1$'s (write one $1$ each time Tape 1 reads a $1$).
+\end{itemize}
+
+After Tape 1 ends, copy Tape 2 then Tape 3 to the final output tape. Result is $0^n1^m$.
+
+\paragraph{Part 2 (Challenge). Multitape TM: input $10^n10^m$, output $10^n10^m10^{nm}$.}
+
+\textbf{Simple 4-tape idea:}
+\begin{itemize}
+  \item Tape 1: input $10^n10^m$.
+  \item Tape 2: store the first zero-block ($n$ zeros).
+  \item Tape 3: store the second zero-block ($m$ zeros).
+  \item Tape 4: build the product block.
+\end{itemize}
+
+Algorithm:
+\begin{enumerate}
+  \item Validate format $10^n10^m$ and copy the two zero-blocks to Tapes 2 and 3.
+  \item For each $0$ on Tape 2, scan Tape 3 once and append all its $0$'s to Tape 4.
+  \item When Tape 2 is finished, Tape 4 has exactly $nm$ zeros.
+  \item Output $10^n10^m10^{nm}$ and halt-accept.
+\end{enumerate}
+
+Why this works: repeating a copy of $m$ zeros exactly $n$ times gives $nm$ zeros.
+
+\subsubsection{Homework 6: Problems on Decidability (Exercise 1)}
+
+For each statement, we say if it is true or false, with a short reason.
+
+\begin{enumerate}
+  \item \textbf{True.} If $L_1$ and $L_2$ are decidable, then $L_1\cup L_2$ is decidable.
+  
+  Run the decider for $L_1$ and the decider for $L_2$ on input $w$. Accept if at least one accepts; otherwise reject.
+
+  \item \textbf{True.} If $L$ is decidable, then $\overline{L}$ is decidable.
+  
+  Just run the decider for $L$ and flip the answer (accept $\leftrightarrow$ reject).
+
+  \item \textbf{True.} If $L$ is decidable, then $L^*$ is decidable.
+  
+  For input $w$ of length $n$, check all possible ways to split $w$ into pieces. There are finitely many splits. For each piece, run the decider for $L$. Accept if some split has all pieces in $L$; else reject.
+
+  \item \textbf{True.} If $L_1$ and $L_2$ are r.e., then $L_1\cup L_2$ is r.e.
+  
+  Run both recognizers in dovetail (step-by-step). If either one accepts, accept.
+
+  \item \textbf{False.} If $L$ is r.e., it does \emph{not} imply $\overline{L}$ is r.e.
+  
+  Counterexample: $HALT=\{\langle M,w\rangle\mid M\text{ halts on }w\}$ is r.e., but $\overline{HALT}$ is not r.e.
+
+  \item \textbf{True.} If $L$ is r.e., then $L^*$ is r.e.
+  
+  A recognizer can enumerate all splits $w=x_1\cdots x_k$ and dovetail runs of the recognizer for $L$ on each $x_i$. If there is a valid split with all $x_i\in L$, it will eventually be found and accepted.
+\end{enumerate}
+
 \section{Evidence of Participation}
 
 \section{Conclusion}\label{conclusion}
