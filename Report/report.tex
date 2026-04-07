@@ -1415,6 +1415,171 @@ For each statement, we say if it is true or false, with a short reason.
   A recognizer can enumerate all splits $w=x_1\cdots x_k$ and dovetail runs of the recognizer for $L$ on each $x_i$. If there is a valid split with all $x_i\in L$, it will eventually be found and accepted.
 \end{enumerate}
 
+\subsection{Week 7}
+
+\subsubsection{Homework 7: Decidable vs r.e. vs co-r.e.}
+
+Given:
+\[
+L_1:=\{M\mid M \text{ halts on itself}\},\quad
+L_2:=\{\langle M,w\rangle\mid M \text{ halts on } w\},\quad
+L_3:=\{\langle M,w,k\rangle\mid M \text{ halts on } w \text{ in at most } k \text{ steps}\}.
+\]
+
+\textbf{1) $L_1$}
+\begin{itemize}
+  \item \textbf{r.e.: yes.} Simulate $M$ on input $\langle M\rangle$. If it halts, accept.
+  \item \textbf{decidable: no.} This is a halting-type problem (same difficulty as $HALT$), so no decider exists.
+  \item \textbf{co-r.e.: no.} If both $L_1$ and $\overline{L_1}$ were r.e., then $L_1$ would be decidable, contradiction.
+\end{itemize}
+
+\textbf{2) $L_2$}
+\begin{itemize}
+  \item \textbf{r.e.: yes.} This is exactly $HALT$. Simulate $M$ on $w$; if it halts, accept.
+  \item \textbf{decidable: no.} $HALT$ is undecidable.
+  \item \textbf{co-r.e.: no.} $\overline{HALT}$ is not r.e.
+\end{itemize}
+
+\textbf{3) $L_3$}
+\begin{itemize}
+  \item \textbf{decidable: yes.} Simulate $M$ on $w$ for exactly $k$ steps. Accept if halts within those steps; otherwise reject.
+  \item \textbf{r.e.: yes.} Every decidable language is r.e.
+  \item \textbf{co-r.e.: yes.} Every decidable language has decidable complement, hence co-r.e.
+\end{itemize}
+
+\subsubsection{Homework 7: Asymptotic Notation (Exercise 2)}
+
+Let $f,g,h:\mathbb{N}\to\mathbb{R}_{\ge 0}$.
+
+\begin{enumerate}
+  \item $f\in O(f)$.
+  
+  Take $c=1$ and any $n_0$. Then $f(n)\le c\,f(n)$ for all $n\ge n_0$.
+
+  \item If $c>0$ is constant, then $O(c\cdot f)=O(f)$.
+  
+  Multiplying by a positive constant only rescales values. So any upper bound of the form $C\,c f(n)$ is still just a constant times $f(n)$, and vice versa.
+  Therefore the two classes are equal.
+
+  \item If $f\le g$ for large enough inputs, then $O(f)\subseteq O(g)$.
+  
+  Let $u\in O(f)$. Then $u(n)\le C f(n)$ eventually. Also $f(n)\le g(n)$ eventually, so $u(n)\le C g(n)$ eventually. Hence $u\in O(g)$.
+
+  \item If $O(f)\subseteq O(g)$, then $O(f+h)\subseteq O(g+h)$.
+  
+  Since $f\in O(f)$ and $O(f)\subseteq O(g)$, we get $f\in O(g)$, so for some $A>0$ and large $n$:
+  \[
+  f(n)\le A\,g(n).
+  \]
+  If $u\in O(f+h)$, then for some $C>0$ and large $n$:
+  \[
+  u(n)\le C(f(n)+h(n))\le C(A g(n)+h(n))\le C\max\{A,1\}(g(n)+h(n)).
+  \]
+  So $u\in O(g+h)$.
+
+  \item If $h(n)>0$ for all $n$ and $O(f)\subseteq O(g)$, then $O(f\cdot h)\subseteq O(g\cdot h)$.
+  
+  As above, $f\in O(g)$, so $f(n)\le A g(n)$ eventually.
+  Let $u\in O(fh)$. Then $u(n)\le C f(n)h(n)\le C A g(n)h(n)$ eventually (valid since $h(n)>0$).
+  Hence $u\in O(gh)$.
+\end{enumerate}
+
+\subsubsection{Homework 7: Asymptotic Notation (Exercise 3)}
+
+Let $i,j,k,n\in\mathbb{N}$.
+
+\begin{enumerate}
+  \item If $j\le k$, then $O(n^j)\subseteq O(n^k)$.
+  
+  For $n\ge 1$, $n^j\le n^k$. Apply Exercise 2(3).
+
+  \item If $j\le k$, then $O(n^j+n^k)\subseteq O(n^k)$.
+  
+  For $n\ge 1$, $n^j+n^k\le 2n^k$, so $n^j+n^k\in O(n^k)$. Therefore $O(n^j+n^k)\subseteq O(n^k)$.
+
+  \item Assume $a_i\ge 0$ for all $i$ and $a_k>0$. Then
+  \[
+  O\!\left(\sum_{i=0}^{k} a_i n^i\right)=O(n^k).
+  \]
+  
+  For $n\ge 1$,
+  \[
+  \sum_{i=0}^{k} a_i n^i \le \left(\sum_{i=0}^{k} a_i\right)n^k,
+  \]
+  so the polynomial is in $O(n^k)$.
+  Also, since $a_k>0$,
+  \[
+  a_k n^k\le \sum_{i=0}^{k} a_i n^i,
+  \]
+  which gives the matching lower-order comparison, so the classes are equal.
+
+  \item $O(\log n)\subseteq O(n)$.
+  
+  For $n\ge 2$, $\log n\le n$, so inclusion follows.
+
+  \item $O(n\log n)\subseteq O(n^2)$.
+  
+  For $n\ge 2$, $\log n\le n$, hence $n\log n\le n^2$.
+\end{enumerate}
+
+\subsubsection{Homework 7: Asymptotic Notation (Exercise 4)}
+
+Relationships between the classes:
+
+\begin{enumerate}
+  \item $O(\sqrt{n})\subsetneq O(n)$.
+  
+  Since $\sqrt{n}\le n$ for $n\ge 1$, inclusion holds. It is strict because $n\notin O(\sqrt{n})$.
+
+  \item $O(n^2)\subsetneq O(2^n)$.
+  
+  Exponential growth dominates polynomial growth, so $n^2\in O(2^n)$, and strictness holds since $2^n\notin O(n^2)$.
+
+  \item $O(\log n)\subsetneq O((\log n)^2)$.
+  
+  For $n\ge 2$, $\log n\le (\log n)^2$. Strictness holds because $(\log n)^2\notin O(\log n)$.
+
+  \item $O(2^n)\subsetneq O(3^n)$.
+  
+  Since $2^n\le 3^n$, inclusion holds. Strictness holds because $3^n/2^n=(3/2)^n\to\infty$, so $3^n\notin O(2^n)$.
+
+  \item $O(\log_2 n)=O(\log_3 n)$.
+  
+  By change of base,
+  \[
+  \log_2 n=\frac{\log_3 n}{\log_3 2},
+  \]
+  so they differ only by a positive constant factor.
+\end{enumerate}
+
+\subsubsection{Homework 7: Asymptotic Notation (Exercise 5)}
+
+Classic sorting comparisons:
+
+\begin{enumerate}
+  \item \textbf{Bubble sort vs Insertion sort}
+  \begin{itemize}
+    \item Bubble sort: worst/average $\Theta(n^2)$, best $\Theta(n)$ only with early-stop optimization.
+    \item Insertion sort: worst/average $\Theta(n^2)$, best $\Theta(n)$ on already sorted input.
+  \end{itemize}
+  So asymptotically they are the same class in worst case: both in $O(n^2)$.
+
+  \item \textbf{Insertion sort vs Merge sort}
+  \begin{itemize}
+    \item Insertion sort: $\Theta(n^2)$ worst/average.
+    \item Merge sort: $\Theta(n\log n)$ worst/average/best.
+  \end{itemize}
+  Merge sort is asymptotically better for large $n$ because $n\log n$ grows slower than $n^2$.
+
+  \item \textbf{Merge sort vs Quick sort}
+  \begin{itemize}
+    \item Merge sort: always $\Theta(n\log n)$.
+    \item Quick sort: average $\Theta(n\log n)$, worst $\Theta(n^2)$ (bad pivots).
+  \end{itemize}
+  So in average case they are similar, but merge sort has the stronger worst-case guarantee.
+  (In practice, quick sort is often very fast due to low constant factors and cache behavior.)
+\end{enumerate}
+
 \section{Evidence of Participation}
 
 \section{Conclusion}\label{conclusion}
