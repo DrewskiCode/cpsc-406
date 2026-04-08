@@ -1580,6 +1580,58 @@ Classic sorting comparisons:
   (In practice, quick sort is often very fast due to low constant factors and cache behavior.)
 \end{enumerate}
 
+\subsection{Week 8}
+
+\subsubsection{Exercise 1}
+
+Rewrite the following formulas in CNF:
+
+\begin{enumerate}
+  \item $\varphi_1 := \neg((a \land b) \lor (\neg c \land d))$
+
+  Using De Morgan's laws,
+  \[
+  \neg((a \land b) \lor (\neg c \land d))
+  = \neg(a \land b) \land \neg(\neg c \land d)
+  = (\neg a \lor \neg b) \land (c \lor \neg d).
+  \]
+  So the CNF is $(\neg a \lor \neg b) \land (c \lor \neg d)$.
+
+  \item $\varphi_2 := \neg((p \lor q) \to (r \land \neg s))$
+
+  First rewrite the implication:
+  \[
+  (p \lor q) \to (r \land \neg s) = \neg(p \lor q) \lor (r \land \neg s).
+  \]
+  Then negate and simplify:
+  \[
+  \neg(\neg(p \lor q) \lor (r \land \neg s))
+  = (p \lor q) \land \neg(r \land \neg s)
+  = (p \lor q) \land (\neg r \lor s).
+  \]
+  So the CNF is $(p \lor q) \land (\neg r \lor s)$.
+\end{enumerate}
+
+\subsubsection{Exercise 2}
+
+Are the following formulas satisfiable? For each one, if yes, give an assignment that makes it true; if not, explain why there does not exist any.
+
+\begin{enumerate}
+  \item $\psi_1 := (a \lor \neg b) \land (\neg a \lor b) \land (\neg a \lor \neg b)$
+  
+  Yes. One satisfying assignment is $a = \text{false}$, $b = \text{false}$.
+  With both variables false, all three clauses are true.
+
+  \item $\psi_2 := (\neg p \lor q) \land (\neg q \lor r) \land \neg(\neg p \lor r)$
+  
+  No. The last clause means $p = \text{true}$ and $r = \text{false}$.
+  Then $(\neg p \lor q)$ forces $q = \text{true}$, but $(\neg q \lor r)$ would then require $r = \text{true}$, which is a contradiction.
+
+  \item $\psi_3 := (x \lor y) \land (\neg x \lor y) \land (x \lor \neg y) \land (\neg x \lor \neg y)$
+  
+  No. The first two clauses force $y = \text{true}$, while the last two clauses force $y = \text{false}$. So no assignment can satisfy all four clauses.
+\end{enumerate}
+
 \section{Evidence of Participation}
 
 \section{Conclusion}\label{conclusion}
