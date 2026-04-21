@@ -1632,6 +1632,124 @@ Are the following formulas satisfiable? For each one, if yes, give an assignment
   No. The first two clauses force $y = \text{true}$, while the last two clauses force $y = \text{false}$. So no assignment can satisfy all four clauses.
 \end{enumerate}
 
+\subsection{Week 9}
+
+\subsubsection{Homework 9: General vs. Horn Resolution}
+
+\textbf{1a) General resolution}
+
+Given
+\[
+\varphi := (a \lor b) \land (\neg a \lor c) \land (\neg b \lor c) \land (\neg c \lor d) \land \neg d.
+\]
+
+Convert to clauses:
+\[
+C_1=(a \lor b),\quad C_2=(\neg a \lor c),\quad C_3=(\neg b \lor c),\quad C_4=(\neg c \lor d),\quad C_5=(\neg d).
+\]
+
+Resolution steps:
+\begin{align*}
+C_6 &: \operatorname{Res}(C_4,C_5) = (\neg c),\\
+C_7 &: \operatorname{Res}(C_2,C_6) = (\neg a),\\
+C_8 &: \operatorname{Res}(C_3,C_6) = (\neg b),\\
+C_9 &: \operatorname{Res}(C_1,C_7) = (b),\\
+C_{10} &: \operatorname{Res}(C_9,C_8) = \Box.
+\end{align*}
+
+Since we derived the empty clause $\Box$, the formula $\varphi$ is \textbf{unsatisfiable}.
+
+\vspace{0.3cm}
+
+\textbf{1b) Unit resolution on a Horn formula}
+
+Given
+\[
+\psi = p \land q \land (\neg p \lor \neg q \lor r) \land (\neg r \lor s) \land \neg s.
+\]
+
+Clause form:
+\[
+D_1=(p),\quad D_2=(q),\quad D_3=(\neg p \lor \neg q \lor r),\quad D_4=(\neg r \lor s),\quad D_5=(\neg s).
+\]
+
+This is a Horn formula because each clause has \emph{at most one positive literal}:
+\begin{itemize}
+  \item $D_1$ has one positive literal ($p$),
+  \item $D_2$ has one positive literal ($q$),
+  \item $D_3$ has one positive literal ($r$),
+  \item $D_4$ has one positive literal ($s$),
+  \item $D_5$ has no positive literal.
+\end{itemize}
+
+Unit-resolution steps (each step uses at least one unit clause):
+\begin{align*}
+D_6 &: \operatorname{Res}(D_4,D_5) = (\neg r),\\
+D_7 &: \operatorname{Res}(D_3,D_1) = (\neg q \lor r),\\
+D_8 &: \operatorname{Res}(D_7,D_2) = (r),\\
+D_9 &: \operatorname{Res}(D_8,D_6) = \Box.
+\end{align*}
+
+So $\psi$ is also \textbf{unsatisfiable}.
+
+\vspace{0.4cm}
+
+\textbf{2 Exercise 2: Drone control system}
+
+Let the propositional variables be:
+\[
+G:\text{ GPS lock is valid},\quad
+B:\text{ battery is healthy},\quad
+M:\text{ manual override key is present},\quad
+E:\text{ motor power is enabled}.
+\]
+
+\textbf{Policy formalization}
+\begin{align*}
+&\text{(P1)}\ (G\land B)\to E,\\
+&\text{(P2)}\ M\to E,\\
+&\text{(P3)}\ \neg B\to \neg E.
+\end{align*}
+
+\textbf{Incident log formalization}
+\[
+\text{(L1)}\ G,\qquad
+\text{(L2)}\ \neg B,\qquad
+\text{(L3)}\ M,\qquad
+\text{(L4)}\ E.
+\]
+
+\textbf{Clause form (CNF)}
+\begin{align*}
+&C_1=(\neg G\lor\neg B\lor E) \quad \text{from (P1)},\\
+&C_2=(\neg M\lor E) \quad \text{from (P2)},\\
+&C_3=(B\lor\neg E) \quad \text{from (P3)},\\
+&C_4=(G),\ C_5=(\neg B),\ C_6=(M),\ C_7=(E) \quad \text{from log.}
+\end{align*}
+
+\textbf{Resolution check for consistency}
+
+Use $C_3=(B\lor\neg E)$ and $C_5=(\neg B)$:
+\[
+\operatorname{Res}(C_3,C_5)=(\neg E).
+\]
+Then resolve with $C_7=(E)$:
+\[
+\operatorname{Res}((\neg E),C_7)=\Box.
+\]
+
+Since we derive the empty clause, the policy together with the incident log is \textbf{inconsistent} (unsatisfiable).
+
+\textbf{Where is the conflict?}
+
+Policy rule (P3) says: if battery is unhealthy ($\neg B$), motor must be blocked ($\neg E$).
+But the log states both $\neg B$ and $E$.
+So the direct conflict is:
+\[
+\neg B\to\neg E \quad \text{vs.} \quad (\neg B \land E)\ \text{in the log.}
+\]
+The manual override ($M$) supports $E$ via (P2), but it does not remove the contradiction with safety rule (P3).
+
 \section{Evidence of Participation}
 
 \section{Conclusion}\label{conclusion}
