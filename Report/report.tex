@@ -1865,6 +1865,68 @@ T(n) = \sum_{i=0}^{\log_2 n} n^2(\ln n - i\ln 2) = \Theta(n^2(\ln n)^2).
 \]
 
 \vspace{0.4cm}
+
+\subsection{Week 12}
+
+\subsubsection{Homework 12: Indicator Random Variables}
+
+\textbf{5.2-3}
+Use indicator random variables to compute the expected value of the sum of $n$ dice.
+
+\textbf{Solution.}
+
+Let $X_i$ be the value on die $i$. The total is $S = X_1 + X_2 + \cdots + X_n$.
+
+Using linearity of expectation:
+\[
+E[S] = E[X_1] + E[X_2] + \cdots + E[X_n].
+\]
+
+For one die:
+\[
+E[X_i] = \frac{1 + 2 + 3 + 4 + 5 + 6}{6} = \frac{21}{6} = 3.5
+\]
+
+So:
+\[
+E[S] = n \cdot 3.5 = \frac{7n}{2}
+\]
+
+\vspace{0.3cm}
+
+\textbf{5.2-4}
+Use indicator random variables to solve the hat-check problem. Each of $n$ customers gives a hat to a hat-check person at a restaurant. The hat-check person gives the hats back to the customers in a random order. What is the expected number of customers who get back their own hat?
+
+\textbf{Solution.}
+
+Let $X_i = 1$ if customer $i$ gets their own hat back, and $X_i = 0$ otherwise.
+
+The total is:
+\[
+X = X_1 + X_2 + \cdots + X_n
+\]
+
+By linearity of expectation:
+\[
+E[X] = E[X_1] + E[X_2] + \cdots + E[X_n]
+\]
+
+The probability that customer $i$ gets their own hat is $P(X_i = 1) = \frac{1}{n}$ (since there are $n$ hats and each customer has a $1/n$ chance of getting theirs).
+
+So:
+\[
+E[X_i] = \frac{1}{n}
+\]
+
+Therefore:
+\[
+E[X] = n \cdot \frac{1}{n} = 1
+\]
+
+The expected number of customers who get their own hat back is $\mathbf{1}$.
+
+\vspace{0.4cm}
+
 \section{Evidence of Participation}
 
 \section{Conclusion}\label{conclusion}
