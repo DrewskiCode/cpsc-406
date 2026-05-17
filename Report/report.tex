@@ -1927,6 +1927,145 @@ The expected number of customers who get their own hat back is $\mathbf{1}$.
 
 \vspace{0.4cm}
 
+\subsection{Week 13}
+
+\subsubsection{Homework 13: Encoding Sudoku}
+
+\textbf{Exercise (Encoding Sudoku).}
+Write up boolean formulas encoding the rules of Sudoku. For each row $r \in \{1, \ldots, 9\}$, column $c \in \{1, \ldots, 9\}$, and value $v \in \{1, \ldots, 9\}$ we introduce a variable $x_{r,c,v}$. The variable $x_{r,c,v}$ is true if and only if the entry $(r, c)$ has value $v$. Formalize each of the conditions $C_k$ as a boolean formula.
+
+\textbf{Solution.}
+
+For brevity, we use the big quantifier notation where $\bigwedge_{i=1}^{n} A_i = A_1 \land A_2 \land \cdots \land A_n$ and $\bigvee_{i=1}^{n} A_i = A_1 \lor A_2 \lor \cdots \lor A_n$.
+
+\vspace{0.2cm}
+\textit{$C_1$: Each entry has at least one value}
+
+\[
+C_1 := \bigwedge_{r=1}^{9} \bigwedge_{c=1}^{9} \bigvee_{v=1}^{9} x_{r,c,v}
+\]
+
+For each cell, at least one of the nine values must be true.
+
+\vspace{0.2cm}
+\textit{$C_2$: Each entry has at most one value}
+
+\[
+C_2 := \bigwedge_{r=1}^{9} \bigwedge_{c=1}^{9} \bigwedge_{v=1}^{8} \bigwedge_{v'=v+1}^{9} (\neg x_{r,c,v} \lor \neg x_{r,c,v'})
+\]
+
+For each cell, no two different values can both be true.
+
+\vspace{0.2cm}
+\textit{$C_3$: Each row has all numbers}
+
+\[
+C_3 := \bigwedge_{r=1}^{9} \bigwedge_{v=1}^{9} \bigvee_{c=1}^{9} x_{r,c,v}
+\]
+
+For each row and each value, that value must appear in at least one column.
+
+\vspace{0.2cm}
+\textit{$C_4$: Each column has all numbers}
+
+\[
+C_4 := \bigwedge_{c=1}^{9} \bigwedge_{v=1}^{9} \bigvee_{r=1}^{9} x_{r,c,v}
+\]
+
+For each column and each value, that value must appear in at least one row.
+
+\vspace{0.2cm}
+\textit{$C_5$: Each (3 × 3)-block has all numbers}
+
+\[
+C_5 := \bigwedge_{b=1}^{9} \bigwedge_{v=1}^{9} \bigvee_{(r,c) \in B_b} x_{r,c,v}
+\]
+
+where $B_b$ is the set of 9 cells in block $b$. For each block and each value, that value must appear in at least one cell of the block.
+
+\vspace{0.2cm}
+\textit{$C_6$: The solution respects the given clues}
+
+\[
+C_6 := \bigwedge_{(r,c,v) \in \text{clues}} x_{r,c,v}
+\]
+
+For each given clue cell at position $(r, c)$ with value $v$, we set $x_{r,c,v}$ to true.
+
+\vspace{0.3cm}
+
+\subsubsection{Probabilistic Algorithm Analysis}
+
+\textbf{Randomized Algorithm: CountLargeRolls(n)}
+
+\textit{Algorithm:}
+\begin{verbatim}
+c <- 0
+for i <- 1 to n do
+  for j <- 1 to 2i do
+    r <- a uniformly random integer from {1, 2, 3, 4, 5, 6}
+    if r >= 5 then
+      c <- c + 1
+return c
+\end{verbatim}
+
+\vspace{0.3cm}
+
+\textbf{Question 1: Big-O worst-case running time}
+
+The outer loop runs $n$ times. For iteration $i$, the inner loop runs $2i$ times. Total iterations:
+\[
+\sum_{i=1}^{n} 2i = 2 \cdot \frac{n(n+1)}{2} = n(n+1) = O(n^2).
+\]
+
+Each iteration does constant work, so the worst-case is $\mathbf{O(n^2)}$.
+
+\vspace{0.3cm}
+
+\textbf{Question 2: Expected value of returned value using indicator variables}
+
+Let $X_{i,j} = 1$ if the $j$-th roll in iteration $i$ is $\geq 5$, and $0$ otherwise.
+
+The total count is:
+\[
+X = \sum_{i=1}^{n} \sum_{j=1}^{2i} X_{i,j}
+\]
+
+By linearity of expectation:
+\[
+E[X] = \sum_{i=1}^{n} \sum_{j=1}^{2i} E[X_{i,j}]
+\]
+
+For each roll, $P(\text{roll} \geq 5) = P(\text{roll} = 5 \text{ or } 6) = \frac{2}{6} = \frac{1}{3}$.
+
+So $E[X_{i,j}] = \frac{1}{3}$ for all $i, j$. Therefore:
+\[
+E[X] = \sum_{i=1}^{n} \sum_{j=1}^{2i} \frac{1}{3} = \frac{1}{3} \sum_{i=1}^{n} 2i = \frac{1}{3} \cdot n(n+1) = \mathbf{\frac{n(n+1)}{3}}
+\]
+
+\vspace{0.3cm}
+
+\textbf{Question 3 (Bonus): What's wrong with the student's reasoning?}
+
+The student says the expected value is $n \cdot \frac{2}{6}$.
+
+The problem is the student only counted the outer loop iterations ($n$) but ignored the inner loop. The inner loop in iteration $i$ runs $2i$ times, not just once. The total number of rolls is $n(n+1)$, not $n$. So the correct expected value is $n(n+1) \cdot \frac{1}{3}$, not $n \cdot \frac{1}{3}$.
+
+\vspace{0.3cm}
+
+\textbf{Question 4 (Bonus): If condition changed to $r = 6$}
+
+If we only count when $r = 6$, then $P(\text{roll} = 6) = \frac{1}{6}$.
+
+So $E[X_{i,j}] = \frac{1}{6}$ and:
+\[
+E[X] = \sum_{i=1}^{n} 2i \cdot \frac{1}{6} = \frac{1}{6} \cdot n(n+1) = \mathbf{\frac{n(n+1)}{6}}
+\]
+
+The expected value would be half of the previous answer since the probability of rolling a 6 is half the probability of rolling 5 or 6.
+
+\vspace{0.3cm}
+
 \section{Evidence of Participation}
 
 \section{Conclusion}\label{conclusion}
