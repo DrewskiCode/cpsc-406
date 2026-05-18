@@ -322,6 +322,12 @@ When comparing the DFAs designed above, several patterns emerge:
 
 \section{Synthesis}
 
+\subsection{General Observations}
+
+\subsubsection{Discord Question}
+
+For the DFA homework, is there a quick way to figure out the language just by looking at the states, or do you always have to test a bunch of strings?
+
 \subsection{Week 2}
 
 \subsubsection{Exercise 1: Product Automata}
@@ -499,6 +505,10 @@ Each arrow in the product just mirrors the arrows in the two base DFAs. The only
 \textbf{Question 4: Obtaining the union language.}
 
 As in Exercise 1, we can apply De Morgan's law. Complement each DFA by flipping accepting/non-accepting states, build the product, and complement again. Equivalently, start from the product above and simply mark as accepting every pair where at least one component is accepting. Either construction yields an automaton $\mathcal{B}'$ whose language is $L(\mathcal{B}^{(1)}) \cup L(\mathcal{B}^{(2)})$.
+
+\subsubsection{Discord Question}
+
+When we build the product automaton, do we need to include every possible pair of states, or only the reachable ones?
 
 \subsection{Week 3}
 
@@ -789,6 +799,10 @@ Therefore $\hat{\delta}(q,x)=q$.
 
 So the statement holds for length $n+1$. By induction, it holds for all $w\in\Sigma^*$.
 
+\subsubsection{Discord Question}
+
+For the NFA to DFA conversion, is it normal for the empty set state to show up, or can we ignore it if it doesn’t matter?
+
 \subsection{Week 4}
 
 \subsubsection{Exercise 1: Kleene's Algorithm}
@@ -1055,6 +1069,10 @@ The starting states are $A$ (first DFA) and $C$ (second DFA). Since $\{A,C\}$ is
 
 $\Rightarrow$ The two DFAs accept the same language: $\varepsilon + (0+1)^*0$
 
+\subsubsection{Discord Question}
+
+In Kleene’s algorithm, how do you know when the regular expression is basically done and won’t simplify much more?
+
 \subsection{Week 5}
 
 \subsubsection{Homework 5: Problems on the Pumping Lemma}
@@ -1149,6 +1167,10 @@ k'+m'=(p-t)+p=2p-t,
 but the actual last block length is $2p$. Not equal. So $xz\notin L_4$, contradiction.
 
 So $L_4$ is not regular.
+
+\subsubsection{Discord Question}
+
+For pumping lemma proofs, how do you usually choose the string so the contradiction is easiest to show?
 
 \subsection{Week 6}
 
@@ -1415,6 +1437,10 @@ For each statement, we say if it is true or false, with a short reason.
   A recognizer can enumerate all splits $w=x_1\cdots x_k$ and dovetail runs of the recognizer for $L$ on each $x_i$. If there is a valid split with all $x_i\in L$, it will eventually be found and accepted.
 \end{enumerate}
 
+\subsubsection{Discord Question}
+
+For the Turing machine problems, is there a general trick for deciding whether to mark symbols, erase them, or just scan once?
+
 \subsection{Week 7}
 
 \subsubsection{Homework 7: Decidable vs r.e. vs co-r.e.}
@@ -1580,6 +1606,10 @@ Classic sorting comparisons:
   (In practice, quick sort is often very fast due to low constant factors and cache behavior.)
 \end{enumerate}
 
+\subsubsection{Discord Question}
+
+For decidable vs. r.e. vs. co-r.e., is the main idea just checking whether you can simulate the machine forever or only for a bounded number of steps?
+
 \subsection{Week 8}
 
 \subsubsection{Exercise 1}
@@ -1631,6 +1661,10 @@ Are the following formulas satisfiable? For each one, if yes, give an assignment
   
   No. The first two clauses force $y = \text{true}$, while the last two clauses force $y = \text{false}$. So no assignment can satisfy all four clauses.
 \end{enumerate}
+
+\subsubsection{Discord Question}
+
+When turning a formula into CNF, is the main strategy just pushing negations inward and then distributing OR over AND?
 
 \subsection{Week 9}
 
@@ -1750,6 +1784,10 @@ So the direct conflict is:
 \]
 The manual override ($M$) supports $E$ via (P2), but it does not remove the contradiction with safety rule (P3).
 
+\subsubsection{Discord Question}
+
+With resolution, how do you tell when you’re close to getting the empty clause instead of just going in circles with more clauses?
+
 \subsection{Week 10}
 
 \subsubsection{Homework 10: Exercises 4.3-1--3: Simple recurrences}
@@ -1787,6 +1825,10 @@ Apply the Master Theorem with $a=2$, $b=2$, and $f(n)=n$. Then $n^{\log_b a}=n^{
 An elementary recursion-tree argument gives the same result: at level $i$ there are $2^i$ subproblems of size about $n/2^i$, each contributing $n/2^i$, so the cost at level $i$ is $2^i\cdot (n/2^i)=n$. There are about $\log_2 n$ levels, so total cost is $n\cdot\log_2 n=\Theta(n\log n)$. To show the lower bound $\Omega(n\log n)$, note every level contributes at least some constant times $n$, and there are $\Theta(\log n)$ levels, giving the lower bound.
 
 \vspace{0.4cm}
+
+\subsubsection{Discord Question}
+
+For recurrence relations, is unrolling usually the easiest way to tell whether it’s going to be like $n^2$ or $n\log n$?
 
 \subsection{Week 11}
 
@@ -1866,6 +1908,10 @@ T(n) = \sum_{i=0}^{\log_2 n} n^2(\ln n - i\ln 2) = \Theta(n^2(\ln n)^2).
 
 \vspace{0.4cm}
 
+\subsubsection{Discord Question}
+
+In recursion trees, how do you decide whether the top level or the total of all the levels is the part that matters most?
+
 \subsection{Week 12}
 
 \subsubsection{Homework 12: Indicator Random Variables}
@@ -1926,6 +1972,10 @@ E[X] = n \cdot \frac{1}{n} = 1
 The expected number of customers who get their own hat back is $\mathbf{1}$.
 
 \vspace{0.4cm}
+
+\subsubsection{Discord Question}
+
+For indicator random variables, is the main trick just making one variable per event and then adding up all the expectations?
 
 \subsection{Week 13}
 
@@ -2065,6 +2115,10 @@ E[X] = \sum_{i=1}^{n} 2i \cdot \frac{1}{6} = \frac{1}{6} \cdot n(n+1) = \mathbf{
 The expected value would be half of the previous answer since the probability of rolling a 6 is half the probability of rolling 5 or 6.
 
 \vspace{0.3cm}
+
+\subsubsection{Discord Question}
+
+For that random-roll algorithm, why isn’t the expected value just the probability of rolling 5 or 6 times the number of outer-loop iterations?
 
 \section{Evidence of Participation}
 
